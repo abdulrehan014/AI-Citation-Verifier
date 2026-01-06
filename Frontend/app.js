@@ -217,7 +217,6 @@ gsap.utils.toArray(".story").forEach((section) => {
   });
 });
 
-
 gsap.utils.toArray(".story").forEach(section => {
   const bg = section.querySelector(".story-bg");
   if (!bg) return;
