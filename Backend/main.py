@@ -7,7 +7,6 @@ app = FastAPI(
     title="TruthLens API",
     description="AI Hallucination & Citation Verification Engine"
 )
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
