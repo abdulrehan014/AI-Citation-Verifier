@@ -87,12 +87,12 @@ TruthLens is designed for students, researchers, journalists, educators, and any
 	2.	Paste AI-generated text into the input box.
 	3.	Click “Verify with TruthLens”.
 	4.	TruthLens will:
-	•	Analyze each sentence individually
-	•	Detect misleading or unsupported claims
-	•	Compute a trust score
-	•	Display a confidence bar
-	•	Explain why the score is low, medium, or high
-	•	Highlight risky sentences clearly
+		•	Analyze each sentence individually
+		•	Detect misleading or unsupported claims
+		•	Compute a trust score
+		•	Display a confidence bar
+		•	Explain why the score is low, medium, or high
+		•	Highlight risky sentences clearly
 
 ---
 
