@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TruthLens</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <section class="hero reveal">
+    <h1>TruthLens</h1>
+    <p>See through AI hallucinations.</p>
+  </section>
+
+  <section class="story reveal">
+    <div class="story-bg"></div>
+    <h2 class="story-text">
+      AI can sound confident<br>
+      while being completely wrong.
+    </h2>
+  </section>
+
+  <section class="story reveal">
+    <div class="story-bg"></div>
+    <h2 class="story-text">
+      Fake citations.<br>
+      Invented studies.<br>
+      False authority.
+    </h2>
+  </section>
+
+  <section class="story reveal">
+    <div class="story-bg"></div>
+    <h2 class="story-text highlight">
+      TruthLens analyzes claims,<br>
+      not confidence.
+    </h2>
+  </section>
+
+  <section class="story steps reveal">
+    <div class="story-bg"></div>
+    <div class="step">Detect factual claims</div>
+    <div class="step">Validate citation relevance</div>
+    <div class="step">Expose misleading authority</div>
+  </section>
+
+  <section class="demo reveal">
+    <textarea
+      id="inputText"
+      class="input-card reveal"
+      placeholder="Paste AI-generated content here..."
+    ></textarea>
+
+    <button class="verify-btn reveal" id="verifyBtn">
+      Verify with TruthLens
+    </button>
+
+    <div id="analysisSection" class="hidden">
+
+      <div class="score">
+        TruthLens Score: <strong id="scoreValue">0%</strong>
+      </div>
+
+      <div class="confidence-bar-wrap">
+        <div class="confidence-bar" id="confidenceBar"></div>
+      </div>
+
+      <div id="confidenceContext" class="confidence-context">
+      </div>
+
+      <div class="analysis-title">Sentence Analysis</div>
+      <div id="sentences"></div>
+
+    </div>
+  </section>
+
+  <script>
+    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+    function animateScore(element, target) {
+      let current = 0;
+      const duration = 900;
+      const start = performance.now();
+
+      function update(now) {
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        current = Math.floor(eased * target);
+        element.innerText = current + "%";
+
+        if (progress < 1) {
+          requestAnimationFrame(update);
+        }
+      }
+
+      requestAnimationFrame(update);
+    }
+
+    document.getElementById("verifyBtn").addEventListener("click", async () => {
+      const text = document.getElementById("inputText").value.trim();
+      if (!text) return;
+
+      const response = await fetch("http://127.0.0.1:8000/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text })
+      });
+
+      const data = await response.json();
+
+      document.getElementById("analysisSection").classList.remove("hidden");
+      const scoreEl = document.getElementById("scoreValue");
+      animateScore(scoreEl, data.trust_score);
+
+    
+      const barEl = document.getElementById("confidenceBar");
+      animateConfidenceBar(barEl, data.trust_score);
+
+      updateConfidenceContext(data.trust_score);
+    
+
+      const container = document.getElementById("sentences");
+      container.innerHTML = "";
+
+      for (const item of data.sentences) {
+        const div = document.createElement("div");
+        div.className = "sentence reveal " + (item.label === "verified" ? "good" : "bad");
+        div.innerText = item.text;
+
+        div.style.opacity = "0";
+        div.style.transform = "translateY(20px)";
+        div.style.transition = "opacity 0.5s ease, transform 0.5s ease";
+
+        container.appendChild(div);
+        div.getBoundingClientRect();
+        await sleep(450);
+
+        div.style.opacity = "1";
+        div.style.transform = "translateY(0)";
+      }
+    });
+
+    function animateConfidenceBar(bar, score) {
+      if (!bar) return;
+
+      let color = "#ff5f5f";
+      if (score >= 70) color = "#4ade80";
+      else if (score >= 40) color = "#f5c542";
+
+      bar.style.backgroundColor = color;
+      bar.style.width = "1%";
+
+      requestAnimationFrame(() => {
+        bar.style.width = score + "%";
+      });
+    }
+
+    function updateConfidenceContext(score) {
+      const ctx = document.getElementById("confidenceContext");
+      if (!ctx) return;
+
+      let text = "";
+      let level = "low";
+
+      if (score >= 70) {
+        level = "high";
+        text =
+          "Most claims are supported by relevant citations or are low-risk factual statements. The content shows strong alignment between claims and sources.";
+      } else if (score >= 40) {
+        level = "medium";
+        text =
+          "Some claims lack strong supporting evidence or use weakly related citations. While not entirely unreliable, parts of the content require closer verification.";
+      } else {
+        level = "low";
+        text =
+          "Several claims rely on misleading or unverifiable citations. This creates false confidence and significantly reduces the trustworthiness of the content.";
+      }
+
+      ctx.className = "confidence-context " + level;
+      ctx.textContent = text;
+      ctx.style.display = "block";
+    }
+  </script>
+
+  <script>
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("show");
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+
+    document.querySelectorAll(".reveal").forEach(el => {
+      observer.observe(el);
+    });
+  </script>
+
+</body>
+</html>
