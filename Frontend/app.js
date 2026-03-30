@@ -216,7 +216,6 @@ gsap.utils.toArray(".story").forEach((section) => {
     pinSpacing: false
   });
 });
-
 gsap.utils.toArray(".story").forEach(section => {
   const bg = section.querySelector(".story-bg");
   if (!bg) return;
