@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 import re
-
 app = FastAPI(
     title="TruthLens API",
     description="AI Hallucination & Citation Verification Engine"
