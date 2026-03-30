@@ -101,7 +101,6 @@ TruthLens is designed for students, researchers, journalists, educators, and any
 	•	🟢 High Confidence – Claims are well-supported or low-risk
 	•	🟡 Medium Confidence – Some claims lack strong evidence
 	•	🔴 Low Confidence – Misleading or unverifiable citations detected
-
 ---
 
 ### Screenshots
